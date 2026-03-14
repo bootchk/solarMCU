@@ -5,12 +5,11 @@
 
 #include "motor.h"
 
+#include "app.h"   // configuration of work
+
 void 
 Work::doWork(void) {
-  /*
-  Uncomment one to choose the work.
-  */
-
+  // Change app.h def of AppWorkIsMotor to choose type of work.
 
 #if AppWorkIsMotor
 // Work is drive small motor a few revs

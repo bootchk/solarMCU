@@ -83,15 +83,15 @@ Motor::driveAFewRevs(void)
     Vcc is not regulated.
     But Vcc affects motor speed.
     */
-
+#ifdef AppMotorIsDC1_3
     // For DC motor, scale duty cycle
-    // Motor::turnOn( motorDutyCycleScaledToVcc() );
-
-    // For BLDC, also scale duty cycle to Vcc
-    // TODO 
+    Motor::turnOn( motorDutyCycleScaledToVcc() );
+#else
+    // TODO For BLDC, also scale duty cycle to Vcc
 
     // Unscaled duty cycle
     Motor::turnOn( AppMotorDutyCycle );
+#endif
 
     /*
     We don't sleep in LPM
@@ -99,7 +99,7 @@ Motor::driveAFewRevs(void)
     the 100uA current of the mcu
     */
     
-    // ten mSec experimentally determined for the specific motor
+    // Pulse length experimentally determined for the specific motor
     Delay:: inMilliseconds(AppMotorPulsemSec);
 
     Motor::turnOff();

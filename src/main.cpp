@@ -1,23 +1,36 @@
 
+/*
+This main() has more explanation
+and uses more abstractions.
+BUT DOESN'T WORK YET.
+
+It uses LPM3.5 explicitly.  That is not abstracted away.
+It hides implementation of LPM3.5 in class LPM5
+*/
+
 #include "msp430.h"
 
 // msp430Drivers library
-#include "msp430Drivers/src/SoC/SoC.h"
-#include "msp430Drivers/src/pinFunction/allPins.h"
-#include "msp430Drivers/src/timer/timer.h"
-#include "msp430Drivers/src/PMM/powerMgtModule.h"
-#include "msp430Drivers/src/PWM/PWM.h"
-#include "msp430Drivers/src/pinFunction/pwmPins.h"
-#include "msp430Drivers/src/resetReason/resetReason.h"
-#include "msp430Drivers/src/timer/counter.h"
+
+// Hides implemention of LPM3.5
 #include "msp430Drivers/src/LPM5/lpm5.h"
+#include "msp430Drivers/src/resetReason/resetReason.h"
 
+// Watchdog
+#include "msp430Drivers/src/SoC/SoC.h"
 
+// Init GPIO
+#include "msp430Drivers/src/pinFunction/allPins.h"
 
+// The app
 #include "workRateFSM.h"
+#include "app.h"  // configuration of app
 
-#include "app.h"
-
+//#include "msp430Drivers/src/timer/timer.h"
+//#include "msp430Drivers/src/PMM/powerMgtModule.h"
+//#include "msp430Drivers/src/PWM/PWM.h"
+//#include "msp430Drivers/src/pinFunction/pwmPins.h"
+//#include "msp430Drivers/src/timer/counter.h"
 
 /*
 App periodically wakes from low power mode to attempt work.
@@ -99,42 +112,41 @@ appInterWorkPeriod(void)
 #else
   // LPM3.5
   LPM5::haltWithRTCWakeup();
-#endif
-}
-
-
-/* 
-On coldstart, we sleep first, to let energy accumulate.
-This accomodates a slowly rising Vcc.
-Otherwise, attempting work might brownout.
-
-This is NOT an epxplicit while loop,
-but does loop through the LPM3.5 and reset mechanism.
-*/
-static void
-appColdstart(void)
-{
-  // Sleep
-  appInterWorkPeriod();
   /*
   Never returns, when using LPM3.5
   Continuation is a reset, and effectively appWakeFromSleep()
   */
+#endif
+}
+  
+
+/*
+When the app needs any extra processing at coldstart,
+we do it here.
+
+It should be a minimum,
+since energy may be low.
+On coldstart, we sleep first, to let energy accumulate.
+This accomodates a slowly rising Vcc.
+Otherwise, attempting work might brownout.
+*/
+static void
+appColdstart(void)
+{
+  // Nothing
 }
 
+/*
+What the app does after a wakeup.
+*/
 static void
 appWakeFromSleep(void)
 {
   // Possibly do work here, depending on state machine
   WorkRateFSM::step();
-
-   appInterWorkPeriod();
-  /*
-  Never returns, when using LPM3.5
-  Continuation is a reset, and eventually appWakeFromSleep() again
-  */
 }
 
+#ifdef OLD
 /* 
 This knows the wakeup is RTC aka Counter.
 
@@ -146,7 +158,7 @@ clearWakeupInterrupt(void)
 {
   Counter::disableAndClearOverflowInterrupt();
 }
-
+#endif
 
 
 int
@@ -160,74 +172,77 @@ main (void)
 
   /*
   Read and clear the reset reason device control register
-  to know whether reset is coldstart (or abnormal)
-  or an expected reset from LMP3.5
+  to know whether reset is:
+    coldstart
+    or abnormal (ignored and treated as coldstart)
+    or an expected reset from LMP3.5
   */
   if (ResetReason::isResetAWakeFromSleep())
   {
+    /* 
+    Must configure GPIO pins and modules
+    exactly as configured for coldstart.
+    */
     initGPIOLowPower();
-    // assert LPM5 bit is off
-    clearWakeupInterrupt();
-    // TODO stop Counter?
+    // Not need to configure RTC again.
+
+    // assert LPM5 lock bit is on
+    // assert GIE interrupt not enabled
+
+    // Unlock the LPM5 lock bit
+    LPM5::unlockConfiguration();
+
+    /*
+    Only now let the wakeup/RTC flag cause an interrupt.
+    It will be serviced immediately, and continue after this.
+
+    This is the crux of the dance wierdness:
+    the interrupt is serviced after we wakeup.
+    We also enable interrupt BEFORE we sleep.
+    */
+    __enable_interrupt();
+    // The ISR has executed but done nothing but clear a flag.
+
+    /*
+    The RTC keeps counting and may flag again.
+    But the ISR does nothing, and since we are not sleeping,
+    the interrupt has no real effect.
+    
+    When you don't want the RTC to flag and interrupt again,
+    you can disable interrupts,
+    or unconfigure the RTC.
+    LPM5::disableWakeupInterrupt();
+    */
+    
+    // Do the periodic work of the app
     appWakeFromSleep();
+
+    /*
+    Require RTC still configured to wake us.
+    Sleep again, enter LPM3.5 with interrupt enabled.
+    */ 
+    appInterWorkPeriod();
   }
   else
   {
     // Coldstart, power on reset
+
     initGPIOLowPower();
+    // Assert the GPIO configuration is same as for wakeup
+
+    // Unlock the LPM5 lock bit
+    LPM5::unlockConfiguration();
+
+    // The RTC stays powered in LPM3.5 and needs configuration
+    // only once, at coldstart.
+    LPM5::configureRTCToWakeup();
+    // Assert RTC will flag an interrupt soon, but GIE is not set.
+    
+    // Do any coldstart specific processing the app wants
     appColdstart();
+
+    // Sleep, enter LPM3.5 for the first time.
+    appInterWorkPeriod();
   }
 }
   
-
-
-
-
-/*
-ISR for the WDT interrupt
-We use the WDT as an interval timer only.
-For delays in LPM3.
-See mspdrivers/lowPower/lowPowerTimer.h
-*/
-#pragma vector = WDT_VECTOR
-__interrupt void WDT_ISR(void)
-{
-    // Nothing to do, just wake from LPM3
-    // We don't set any flags to record the purpose of the timer lapse.
-    // Main just continues after any delay.
-    //
-    // There can be many reasons for delay:
-    // 1. for sleeping period.
-    // 2. delay during work (say blink LED).
-
-    // Exit LPM3 on return (RETI)to main
-    // This clears the LPM3 bits in the SR saved on the stack.
-    __bic_SR_register_on_exit(LPM3_bits);
-}
-
-
-
-#pragma vector = RTC_VECTOR
-__interrupt void RTC_ISR(void)
-{
-  __bic_SR_register_on_exit(LPM3_bits);
-}
-
-
-
-/*
-Catch unintended interrupts.
-*/
-
-#pragma vector=unused_interrupts
-interrupt void myTrap(void)
-{
-  while (true)
-  {
-    /*
-     * Break into the debugger (aka BKPT) if it is running, else NOP.
-     * The EEM on MSP430 looks for this opcode.
-     */
-    __op_code(0x4343);
-  }
-}
