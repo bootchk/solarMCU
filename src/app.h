@@ -38,6 +38,10 @@ might not be visible.
 //#define AppMotorPulsemSec 1000
 
 #ifdef AppMotorIsDC1_3
+// Experimentally, 10 mSec is about one rev
+// 20 mSec is a few revs
+// 20mSec with storage of 2mF droops Vcc 0.6V
+//#define AppMotorPulsemSec 20
 #define AppMotorPulsemSec 10
 #endif
 #ifdef AppMotorIsNFP1215
@@ -61,7 +65,7 @@ In centivolts.
 */
 // For DC motor
 // Nominal 1.3V
-#define AppMinVccToWork 220
+#define AppMinVccToWork 240
 
 // For Maxon EC9.2 BLDC motor
 // Nominal 3V
