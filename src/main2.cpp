@@ -12,11 +12,13 @@ The abstraction used is: app work.
 #include <msp430.h>
 
 #include "workRateFSM.h"
+#include "energy.h"
 
 
 
 void initGpio(void)
 {
+    // All GPIO pins are outputs, low, with no pullup.
     P1DIR = 0xFF; P2DIR = 0xFF; 
     P1REN = 0xFF; P2REN = 0xFF; 
     P1OUT = 0x00; P2OUT = 0x00;
@@ -26,6 +28,9 @@ void initGpio(void)
     P3REN = 0xFF;
     P3OUT = 0x00;
 #endif
+
+    // For some implementations, init input pin used to monitor energy availability.
+    Energy::initPin();
 }
 
 
@@ -110,6 +115,8 @@ appColdstart()
 
 int main(void)
 {
+    // Regardless of how we wake up, 
+    // stop the WDT and configure GPIO before doing anything else.
     WDTCTL = WDTPW | WDTHOLD;               // Stop WDT
 
     initGpio();                             // Configure GPIO
