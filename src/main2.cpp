@@ -45,7 +45,7 @@ void initRTCInTicks(uint16_t ticks)
     // Configure RTC
     // VLO clock source @ 12kHz
 
-    // Interrupt and reset happen every 1024/12000 * 32 = 3 sec.
+    // Interrupt and reset happen every 1024/12000 * ticks sec.
     RTCMOD = ticks-1;
     RTCCTL = RTCSS__VLOCLK | RTCSR |RTCPS__1024;
 
