@@ -4,11 +4,8 @@
 #include "app.h"
 
 
-// Configure what rail to monitor for energy availability, and how to monitor it.
-#define EnergyFromVcc 1
 
-#ifdef EnergyFromVcc
-
+#if EnergyFromVcc
 
 // implementation uses ADC on Vcc
 #include "msp430Drivers/src/ADC/adc.h"
@@ -41,9 +38,10 @@ bool Energy::isEnoughToWork() {
         return  (ADC::measureVccCentiVolts() > AppMinVccToWork);
 };
 
-#else
+#elif defined(EnergyFromVHighRail)
 
 // Implementation uses GPIO
+#include <gpio.h>   // depends on msp430.h
 
 #define VoltageMonitorPort  GPIO_PORT_P1
 #define VoltageMonitorPin   GPIO_PIN0
@@ -61,8 +59,11 @@ That has a voltage monitor with digital out that is high
 when voltage is above some threshold.
 */
 bool Energy::isEnoughToWork() {
-        // voltage monitor pin is high
-        
+        // When voltage monitor pin is high
         return (GPIO_getInputPinValue(VoltageMonitorPort, VoltageMonitorPin) != 0);
 };
+
+
+#else
+    #error "Set EnergyFromVcc or EnergyFromVHighRail"
 #endif
