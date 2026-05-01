@@ -11,6 +11,9 @@ The abstraction used is: app work.
 #include <cstdint>
 #include <msp430.h>
 
+// msp430drivers
+#include "msp430Drivers/src/periodicInterrupt/periodicInterrupt.h"
+
 #include "workRateFSM.h"
 #include "energy.h"
 
@@ -44,37 +47,9 @@ We don't start and stop the RTC.
 Interrupts are periodic and continue.
 */
 
-// Init RTC to alarm after ticks (of 1024/12000 = .0853 seconds)
-void initRTCInTicks(uint16_t ticks)
-{
-    // Configure RTC
-    // VLO clock source @ 12kHz
-
-    // Interrupt and reset happen every 1024/12000 * ticks sec.
-    RTCMOD = ticks-1;
-    RTCCTL = RTCSS__VLOCLK | RTCSR |RTCPS__1024;
-
-    // Enable interrupt from device, but not the GIE
-    RTCCTL |= RTCIE;
-}
-
-
-void initRTC48Seconds(void)
-{
-    // 512 * .0853 = 43.7 seconds
-    initRTCInTicks(512);
-}
-
-void initRTC3Seconds(void)
-{
-    // 32 * .0853 = 2.7seconds
-    initRTCInTicks(32);
-}
-
 void initRTC(void)
 {
-    //initRTC3Seconds();
-    initRTC48Seconds();
+    PeriodicInterrupt::initInSeconds(48);
 }
 
 
@@ -152,7 +127,7 @@ int main(void)
         // activate GPIO configuration
         PM5CTL0 &= ~LOCKLPM5;
 
-        // Configure RTC to interrupt every 3 seconds.
+        // Configure RTC to interrupt every interwork period.
         // Only done once, on coldstart.
         // The RTC will request and use the VLO, which stays on.
         initRTC();
