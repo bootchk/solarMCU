@@ -14,6 +14,7 @@ The abstraction used is: app work.
 // msp430drivers
 #include "msp430Drivers/src/periodicInterrupt/periodicInterrupt.h"
 
+#include "app.h"
 #include "workRateFSM.h"
 #include "energy.h"
 
@@ -49,7 +50,7 @@ Interrupts are periodic and continue.
 
 void initRTC(void)
 {
-    PeriodicInterrupt::initInSeconds(48);
+    PeriodicInterrupt::initInSeconds(AppInterWorkPeriodInSeconds);
 }
 
 

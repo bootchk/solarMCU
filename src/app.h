@@ -6,6 +6,10 @@ The app is always: every period, work i.e. drive motor a few revs
 if energy permits.
 
 Referenced by many source files.
+
+board.h must define a board that supports the app choices.
+E.g. not all boards have a separate high rail.
+E.g. some boards the PWM is too a motor driver IC.
 */
 
 // If false, work is LED
