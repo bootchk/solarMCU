@@ -50,6 +50,9 @@ Experimentally:
 #define AppMotorPulsemSec 15
 //#define AppMotorPulsemSec 20
 
+/* Duty cycle motor to achieve average 1.3V to motor starting. */
+#define DUTY_CYCLE_SCHEDULE_2 1
+
 #endif
 
 #ifdef AppMotorIsNFP1215
