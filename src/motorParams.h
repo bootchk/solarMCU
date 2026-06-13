@@ -38,12 +38,18 @@ without dropping Vcc too much.
 //#define AppMotorPulsemSec 1000
 
 #ifdef AppMotorIsDC1_3
-// Experimentally:
-// 10 mSec is one rev
-// 20 mSec is a few revs
-// 20mSec with storage of 2mF droops Vcc 0.6V
+/*
+Experimentally:
+   10 mSec is one rev
+   20 mSec is a few revs
+
+   20mSec with storage of 2mF droops Vcc 0.6V
+*/
+
+//#define AppMotorPulsemSec 10
+#define AppMotorPulsemSec 15
 //#define AppMotorPulsemSec 20
-#define AppMotorPulsemSec 10
+
 #endif
 
 #ifdef AppMotorIsNFP1215
@@ -77,6 +83,7 @@ when work is flashing an LED and choice of motor is not defined.
 // 4mm diameter DC motor, pager motor.
 // Nominal 1.3V
 #define AppMinVccToWork 240
+#define AppMinVccToKeepWork 190
 #endif
 #ifdef AppMotorIsMaxonEC9_2
 // For Maxon EC9.2 BLDC motor

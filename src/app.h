@@ -28,7 +28,12 @@ E.g. some boards the PWM is too a motor driver IC.
 #define EnergyFromVHighRail 0
 
 
-#define AppInterWorkPeriodInSeconds 48
+// This is the production value for solar mobiles
+// #define AppInterWorkPeriodInSeconds 60
+
+// This is a test value for experiments
+#define AppInterWorkPeriodInSeconds 5
+
 
 
 // Must follow choice of motor.

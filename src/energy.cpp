@@ -38,6 +38,11 @@ bool Energy::isEnoughToWork() {
         return  (ADC::measureVccCentiVolts() > AppMinVccToWork);
 };
 
+bool Energy::isEnoughToKeepWork() {
+        // more than 1.9V, the brownout voltage of the MCU
+        return  (ADC::measureVccCentiVolts() > AppMinVccToKeepWork);
+};
+
 #elif defined(EnergyFromVHighRail)
 
 // Implementation uses GPIO

@@ -5,6 +5,7 @@
 #include "msp430Drivers/src/delay/delay.h"
 #include "msp430Drivers/src/ADC/adc.h"
 
+#include "energy.h"
 #include "app.h"
 
 /*
@@ -181,12 +182,26 @@ Motor::driveAFewRevs(void)
 
     /*
     We don't sleep in LPM
-    because the tens of mA current of the motor dominates
-    the 100uA current of the mcu
+    because the tens of mA current of motor dominates
+    the 100uA current of the mcu.
     */
     
-    // Pulse length experimentally determined for the specific motor
-    Delay:: inMilliseconds(AppMotorPulsemSec);
+    //Pulse length experimentally determined for the specific motor
+
+    // A simple delay risks exhausting energy and booting MCU.
+    // Delay:: inMilliseconds(AppMotorPulsemSec);
+
+    /* Loop, monitoring Vcc after every mSec. */
+    for (int i = AppMotorPulsemSec; i > 0; i--)
+    {
+        if (Energy::isEnoughToKeepWork()){
+            Delay:: inMilliseconds(1);
+        }
+        else {
+            // Energy near exhausted.  Stop driving motor.
+            Motor::turnOff();
+        }
+    }
 
     Motor::turnOff();
 }
