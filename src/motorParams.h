@@ -31,11 +31,6 @@ from known storage,
 without dropping Vcc too much.
 */
 
-//#define AppMotorPulsemSec 10
-//#define AppMotorPulsemSec 50
-//#define AppMotorPulsemSec 100
-//#define AppMotorPulsemSec 150
-//#define AppMotorPulsemSec 1000
 
 #ifdef AppMotorIsDC1_3
 /*
@@ -45,12 +40,9 @@ Experimentally:
 
    20mSec with storage of 2mF droops Vcc 0.6V
 */
-
-//#define AppMotorPulsemSec 10
 #define AppMotorPulsemSec 15
-//#define AppMotorPulsemSec 20
 
-/* Duty cycle motor to achieve average 1.3V to motor starting. */
+/* Duty cycle motor to achieve average >1.6V to motor starting. */
 #define DUTY_CYCLE_SCHEDULE_2 1
 
 #endif
@@ -82,17 +74,20 @@ Where work is a DC or BLDC motor.
 This doesn't properly set AppMinVccToWork
 when work is flashing an LED and choice of motor is not defined.
 */
+
 #ifdef AppMotorIsDC1_3
 // 4mm diameter DC motor, pager motor.
 // Nominal 1.3V
 #define AppMinVccToWork 240
 #define AppMinVccToKeepWork 190
 #endif
+
 #ifdef AppMotorIsMaxonEC9_2
 // For Maxon EC9.2 BLDC motor
 // Nominal 3V
 #define AppMinVccToWork 240
 #endif
+
 #ifdef AppMotorIsNFP1215
 // For NFP1215 BLDC motor
 // Nominal starting voltage 3.5
@@ -100,6 +95,7 @@ when work is flashing an LED and choice of motor is not defined.
 // NFP215 on Launchpad, whose Vcc is 3.3V nominal, 3.2 actual
 #define AppMinVccToWork 320
 #endif
+
 #ifdef AppMotorIsNidec6s
 // For Nidec 6s BLDC motor rated 12V, but starts at 5V
 // !!! Not used, instead an external voltage monitor is used, 

@@ -13,10 +13,12 @@ the desired voltage on the motor.
 
 Desired voltage on motor is less than 1.6V.
 The motor is rated nominal 1.3V, operating 1.1-1.6V
-That is the voltage for a certain high speed under load.
+The 1.6V determines a certain high speed.
+The voltage the motor insulation will withstand is not specified,
+but surely much higher than 3V.
 
 We are starting the motor.
-We apply a slightly higher voltage.
+We apply a slightly higher voltage than 1.6V
 That increases likelihood of starting?
 The motor will tolerate it, for a short time.
 We are pulsing the motor.
@@ -25,7 +27,7 @@ we would reduce the duty cycle (perceived voltage)
 a short time after starting the motor.
 
 Based on Vcc now, which varies.
-We turn the motor when Vcc > 2.2V.
+We turn the motor when Vcc > 2.4V.
 Vcc must remain above 1.8V to avoid brownout of MCU
 
 Vcc on storage capacitor should droop no more than 0.3V

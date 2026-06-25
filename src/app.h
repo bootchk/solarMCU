@@ -10,41 +10,64 @@ Referenced by many source files.
 board.h must define a board that supports the app choices.
 E.g. not all boards have a separate high rail.
 E.g. some boards the PWM is too a motor driver IC.
+
+The parameters are:
+    AppWorkIsMotor (otherwise LED)
+    AppMotorIs: which motor
+    EnergyFrom: what rail to monitor for energy availability, and how to monitor it.
+    AppInterWorkPeriodInSeconds
+
+Other parameters are in motorParams.h
 */
 
-// If false, work is LED
-// A hack to test with an LED instead of a motor.
-#define AppWorkIsMotor 1
+/*
+!!! Correctness of app also might depend
+on correct configuration of msp430Drivers library via its board.h.
+E.G. it declares what GPIO pins used for PWM to motor,
+or GPIO pin used to enable motor driver IC.
+!!! Configuration declarations do not yet flow from this file to board.h
+*/
 
-// Choose one motor
+/*
+A set of parameters declares the total config of the app.
+Choice of motor defines another set of parameters.
+*/
+
+#define AppIsProductionDC1_3 1
+
+#if defined(AppIsProductionDC1_3)
+// Production value using small DC motor
+#define AppWorkIsMotor 1
 #define AppMotorIsDC1_3
+#define EnergyFromVcc  1
+#define AppInterWorkPeriodInSeconds 60
+
+#elif defined(AppIsBenchTestDC1_3)
+// Test value using small DC motor
+// Turn more often to reduce wait for result.
+#define AppWorkIsMotor 1
+#define AppMotorIsDC1_3
+#define EnergyFromVcc  1
+#define AppInterWorkPeriodInSeconds 5
+
+#elif defined(AppIsTestBLDC)
+
+// Other BLDC motors for other use cases
 //#define AppMotorIsMaxonEC9_2
 //#define AppMotorIsNFP1215
 //#define AppMotorIsNidec6s
 
-// Configure what rail to monitor for energy availability, and how to monitor it.
-// Set one of these to 1
-#define EnergyFromVcc       1
-#define EnergyFromVHighRail 0
+#define AppWorkIsMotor 1
+#define AppMotorIsNFP1215
+#define EnergyFromVHighRail 1
+#define AppInterWorkPeriodInSeconds 60
 
+#else
 
-// This is the production value for solar mobiles
-// #define AppInterWorkPeriodInSeconds 60
+#endif
 
-// This is a test value for experiments
-#define AppInterWorkPeriodInSeconds 5
 
 
 
 // Must follow choice of motor.
 #include "motorParams.h"
-
-
-/*
-This macro was used when using low power timer (say WDT)
-and not when using RTC.
-CRUFT
-*/
-//#define AppInterWorkPeriod LowPowerTimer::delayThreeSeconds
-//#define AppInterWorkPeriod LowPowerTimer::delay48Seconds
-// #define AppInterWorkPeriod LowPowerTimer::delayFiveSeconds
