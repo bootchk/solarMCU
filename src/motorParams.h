@@ -31,8 +31,19 @@ from known storage,
 without dropping Vcc too much.
 */
 
+/*
+Vcc at which enough energy to work.
+For implementations that monitor Vcc with ADC, this is a voltage threshold.
 
-#ifdef AppMotorIsDC1_3
+In centivolts.
+
+Where work is a DC or BLDC motor.
+This doesn't properly set AppMinVccToWork
+when work is flashing an LED and choice of motor is not defined.
+*/
+
+
+#if defined(AppMotorIsDC1_3)
 /*
 Experimentally:
    10 mSec is one rev
@@ -45,60 +56,56 @@ Experimentally:
 /* Duty cycle motor to achieve average >1.6V to motor starting. */
 #define DUTY_CYCLE_SCHEDULE_2 1
 
-#endif
+// 4mm diameter DC motor, pager motor.
+// Nominal 1.3V
+#define AppMinVccToWork 240
+#define AppMinVccToKeepWork 190
 
-#ifdef AppMotorIsNFP1215
+
+
+
+#elif defined(AppMotorIsMaxonEC9_2)
+
+// For Maxon EC9.2 BLDC motor
+
 #define AppMotorPulsemSec 100
 #define AppMotorDutyCycle 20
-#endif
+#define DUTY_CYCLE_SCHEDULE_NONE 1
 
-#ifdef AppMotorIsNidec6s
+
+// Motor requires nominal 3V
+#define AppMinVccToWork 240
+#define AppMinVccToKeepWork 190
+
+
+
+#elif defined(AppMotorIsNFP1215)
+
+// For NFP1215 BLDC motor
+#define AppMotorPulsemSec 100
+#define AppMotorDutyCycle 20
+
+// Nominal starting voltage 3.5
+#define AppMinVccToWork 340
+// NFP215 on Launchpad, whose Vcc is 3.3V nominal, 3.2 actual
+#define AppMinVccToWork 320
+
+
+#elif defined(AppMotorIsNidec6s)
+
 // Experiment: duration 10, speed 20 turns a fraction of one rev @5.7V
 // Duration
 #define AppMotorPulsemSec 100
 // Speed
 #define AppMotorDutyCycle 20
-#endif
 
-
-
-
-
-/*
-Vcc at which enough energy to work.
-For implementations that monitor Vcc with ADC, this is a voltage threshold.
-
-In centivolts.
-
-Where work is a DC or BLDC motor.
-This doesn't properly set AppMinVccToWork
-when work is flashing an LED and choice of motor is not defined.
-*/
-
-#ifdef AppMotorIsDC1_3
-// 4mm diameter DC motor, pager motor.
-// Nominal 1.3V
-#define AppMinVccToWork 240
-#define AppMinVccToKeepWork 190
-#endif
-
-#ifdef AppMotorIsMaxonEC9_2
-// For Maxon EC9.2 BLDC motor
-// Nominal 3V
-#define AppMinVccToWork 240
-#endif
-
-#ifdef AppMotorIsNFP1215
-// For NFP1215 BLDC motor
-// Nominal starting voltage 3.5
-#define AppMinVccToWork 340
-// NFP215 on Launchpad, whose Vcc is 3.3V nominal, 3.2 actual
-#define AppMinVccToWork 320
-#endif
-
-#ifdef AppMotorIsNidec6s
 // For Nidec 6s BLDC motor rated 12V, but starts at 5V
 // !!! Not used, instead an external voltage monitor is used, 
 // see energy.cpp
 #define AppMinVccToWork 500
+
+
+#else
+#error "boardParams.h does not define AppMotorIs..."
 #endif
+

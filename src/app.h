@@ -32,8 +32,8 @@ or GPIO pin used to enable motor driver IC.
 A set of parameters declares the total config of the app.
 Choice of motor defines another set of parameters.
 */
-
-#define AppIsProductionDC1_3 1
+//#define AppIsProductionDC1_3 1
+#define AppIsTestBLDCMaxon 1
 
 #if defined(AppIsProductionDC1_3)
 // Production value using small DC motor
@@ -50,20 +50,25 @@ Choice of motor defines another set of parameters.
 #define EnergyFromVcc  1
 #define AppInterWorkPeriodInSeconds 5
 
-#elif defined(AppIsTestBLDC)
+#elif defined(AppIsTestBLDCMaxon)
 
-// Other BLDC motors for other use cases
-//#define AppMotorIsMaxonEC9_2
-//#define AppMotorIsNFP1215
-//#define AppMotorIsNidec6s
+#define AppWorkIsMotor 1
+#define AppMotorIsMaxonEC9_2
+#define EnergyFromVcc  1
+#define AppInterWorkPeriodInSeconds 5
+
+#elif defined(AppIsTestBLDCNFP1215)
 
 #define AppWorkIsMotor 1
 #define AppMotorIsNFP1215
 #define EnergyFromVHighRail 1
 #define AppInterWorkPeriodInSeconds 60
 
-#else
+// Other BLDC motors for other use cases
+//#define AppMotorIsNidec6s
 
+#else
+#error "app.h does not define AppIs..."
 #endif
 
 

@@ -158,6 +158,10 @@ DutyCycleMotor::scaledToVcc()
     
     return result;
 }
+#elif defined(DUTY_CYCLE_SCHEDULE_NONE)
+
+// Don't need this function, and link will fail if called.
+
 #else
-  #warning "Motor duty cycle not defined"
+  #warning "Motor duty cycle schedule not defined"
 #endif

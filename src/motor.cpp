@@ -67,7 +67,8 @@ Motor::driveAFewRevs(void)
     // For DC motor, scale duty cycle
     Motor::turnOn( DutyCycleMotor::scaledToVcc() );
 #else
-    // TODO For BLDC, also scale duty cycle to Vcc
+    // For BLDC, the driver IC controls voltage,
+    // and duty cycle is just the desired speed.
 
     // Unscaled duty cycle
     Motor::turnOn( AppMotorDutyCycle );
