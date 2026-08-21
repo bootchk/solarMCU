@@ -33,7 +33,9 @@ A set of parameters declares the total config of the app.
 Choice of motor defines another set of parameters.
 */
 //#define AppIsProductionDC1_3 1
-#define AppIsTestBLDCMaxon 1
+//#define AppIsTestBLDCMaxon 1
+#define AppIsProductionBLDCMaxon 1
+
 
 #if defined(AppIsProductionDC1_3)
 // Production value using small DC motor
@@ -55,7 +57,14 @@ Choice of motor defines another set of parameters.
 #define AppWorkIsMotor 1
 #define AppMotorIsMaxonEC9_2
 #define EnergyFromVcc  1
-#define AppInterWorkPeriodInSeconds 5
+#define AppInterWorkPeriodInSeconds 15
+
+#elif defined(AppIsProductionBLDCMaxon)
+
+#define AppWorkIsMotor 1
+#define AppMotorIsMaxonEC9_2
+#define EnergyFromVcc  1
+#define AppInterWorkPeriodInSeconds 60
 
 #elif defined(AppIsTestBLDCNFP1215)
 

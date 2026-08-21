@@ -68,13 +68,25 @@ Experimentally:
 
 // For Maxon EC9.2 BLDC motor
 
-#define AppMotorPulsemSec 100
-#define AppMotorDutyCycle 20
+// 100mSec is > 20 revs
+// 10mSec is 3-5 revs
+//#define AppMotorPulsemSec 15
+// Can pulse indefinitely, and we stop when Vcc drops below AppMinVccToKeepWork
+#define AppMotorPulsemSec 30
+
+// 20% turns visibly fast
+// 10% turns visibly slower
+//#define AppMotorDutyCycle 10
+// Starts more reliably at 100% duty cycle
+#define AppMotorDutyCycle 100
 #define DUTY_CYCLE_SCHEDULE_NONE 1
 
 
 // Motor requires nominal 3V
-#define AppMinVccToWork 240
+// It does NOT start reliably at less than 2.6V
+// (with an unregulated supply that falls immediately from 2.6V)
+// Loaded, it may not start at less than 3.0V
+#define AppMinVccToWork 310
 #define AppMinVccToKeepWork 190
 
 
