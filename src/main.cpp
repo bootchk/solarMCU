@@ -13,6 +13,7 @@ The abstraction used is: app work.
 
 // msp430drivers
 #include "msp430Drivers/src/periodicInterrupt/periodicInterrupt.h"
+#include "msp430Drivers/src/motorControl/motorControl.h"
 
 #include "app.h"
 #include "workRateFSM.h"
@@ -37,6 +38,8 @@ void initGpio(void)
 
     // For some implementations, init input pin used to monitor energy availability.
     Energy::initPin();
+
+    MotorControl::initPins();
 }
 
 

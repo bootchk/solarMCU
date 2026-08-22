@@ -80,7 +80,7 @@ Experimentally:
 // Starts more reliably at 100% duty cycle
 #define AppMotorDutyCycle 100
 #define DUTY_CYCLE_SCHEDULE_NONE 1
-
+#define MOTOR_POLE_PAIRS 4
 
 // Motor requires nominal 3V
 // It does NOT start reliably at less than 2.6V

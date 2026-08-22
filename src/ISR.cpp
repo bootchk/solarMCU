@@ -1,7 +1,7 @@
 
 #include <msp430.h>
 
-
+#include "msp430Drivers/src/motorControl/motorControl.h"
 
 /*
 ISR for the WDT interrupt
@@ -54,7 +54,22 @@ __interrupt void RTC_ISR(void)
   //__bic_SR_register_on_exit(LPM3_bits);
 }
 
-
+#pragma vector = TIMERB0_VECTOR
+__interrupt void TIMERB0_ISR(void)
+{
+  // Reading the interrupt flags clears all flags
+  switch(TBIV)
+    {
+        // Expected
+        case CCIFG:     // counted desired pulses
+        // Unexpected
+        default:
+          // In all cases, pretend correct
+          MotorControl::handleInterrupt();
+          break;
+    }
+  // Not in LPM
+}
 
 /*
 Catch unintended interrupts.

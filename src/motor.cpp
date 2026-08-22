@@ -4,6 +4,9 @@
 #include "msp430Drivers/src/PWM/PWM.h"
 #include "msp430Drivers/src/delay/delay.h"
 #include "msp430Drivers/src/ADC/adc.h"
+#include "msp430Drivers/src/motorControl/motorControl.h"
+#include "msp430Drivers/src/SoC/SoC.h"
+
 
 #include "energy.h"
 #include "dutyCycleMotor.h"
@@ -54,15 +57,23 @@ Motor::turnOff(void)
 }
 
 
+/*
+Vcc varies by light condition.
+Vcc is not regulated.
+Vcc affects motor speed.
 
+A period of time determines how many turns.
+But we also stop prematurely when:
+   Vcc droops too low
+   Motor feedback tells the count of turns
+*/
 void
 Motor::driveAFewRevs(void)
 {
-    /*
-    In this design, Vcc varies by light condition.
-    Vcc is not regulated.
-    But Vcc affects motor speed.
-    */
+    MotorControl::startTurnCounter(1, MOTOR_POLE_PAIRS);
+    // requires GIE enabled
+    SoC::enableGlobalInterrupts();
+
 #ifdef AppMotorIsDC1_3
     // For DC motor, scale duty cycle
     Motor::turnOn( DutyCycleMotor::scaledToVcc() );
@@ -89,13 +100,23 @@ Motor::driveAFewRevs(void)
     for (int i = AppMotorPulsemSec; i > 0; i--)
     {
         if (Energy::isEnoughToKeepWork()){
-            Delay:: inMilliseconds(1);
+            // Have we turned enough revs?
+            if (MotorControl::wasCountReachedFlag())
+                // Turned desired turns.
+                // Quit loop and stop driving motor.
+                break;
+            else
+                Delay:: inMilliseconds(1);
         }
         else {
-            // Energy near exhausted.  Stop driving motor.
-            Motor::turnOff();
+            // Energy near exhausted.  
+            // Quit loop and stop driving motor.
+            
+            break;
         }
     }
 
+    MotorControl::stopTurnCounter();
+    // TODO disableGIE ?
     Motor::turnOff();
 }
