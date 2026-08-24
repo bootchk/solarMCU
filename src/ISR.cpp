@@ -54,15 +54,38 @@ __interrupt void RTC_ISR(void)
   //__bic_SR_register_on_exit(LPM3_bits);
 }
 
-#pragma vector = TIMERB0_VECTOR
-__interrupt void TIMERB0_ISR(void)
+// Pin interrupt from motor drive FG pin
+// to GPIO pin as input.
+#pragma vector = PORT2_VECTOR
+__interrupt void Port2_ISR(void)
 {
-  // Reading the interrupt flags clears all flags
+  MotorControl::handlePinInterrupt();
+  // Not in LPM
+}
+
+
+// Special vector for CCR0 of TimerB0.
+// No need to read TBIV, and clears CCR0IFG automatically
+// AKA TIMERB0_VECTOR
+#pragma vector = TIMER0_B0_VECTOR
+__interrupt void TimerB0_CCR0_ISR(void)
+{
+  MotorControl::handleTimerInterrupt();
+  // Not in LPM
+}
+
+
+#ifdef CRUFT
+// Vector for CCR1,2 and overflow of TimerB0.
+#pragma vector = TIMER0_B1_VECTOR
+__interrupt void TimerB0_Other_ISR(void)
+{
+  // Reading the interrupt flags clears highest flag?
   switch(TBIV)
     {
-        // Expected
-        case CCIFG:     // counted desired pulses
-        // Unexpected
+        // Cases are TBIV__NONE, TBIV__TBCCR1, TBIV__TBCCR2, TBIV__TBIFG
+
+        // All are unexpected: not using CCR1, CCR2, or overflow
         default:
           // In all cases, pretend correct
           MotorControl::handleInterrupt();
@@ -70,6 +93,8 @@ __interrupt void TIMERB0_ISR(void)
     }
   // Not in LPM
 }
+#endif
+
 
 /*
 Catch unintended interrupts.

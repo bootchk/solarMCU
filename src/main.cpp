@@ -39,7 +39,8 @@ void initGpio(void)
     // For some implementations, init input pin used to monitor energy availability.
     Energy::initPin();
 
-    MotorControl::initPins();
+    MotorControl::initPinsForSingleTurn();
+    // MotorControl::initPinsForTurnCount();
 }
 
 

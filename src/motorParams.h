@@ -70,9 +70,9 @@ Experimentally:
 
 // 100mSec is > 20 revs
 // 10mSec is 3-5 revs
-//#define AppMotorPulsemSec 15
+#define AppMotorPulsemSec 15
 // Can pulse indefinitely, and we stop when Vcc drops below AppMinVccToKeepWork
-#define AppMotorPulsemSec 30
+//#define AppMotorPulsemSec 30
 
 // 20% turns visibly fast
 // 10% turns visibly slower

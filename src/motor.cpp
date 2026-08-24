@@ -40,7 +40,9 @@ We could change the duty cycle as Vcc drops but we don't.
 
 // Require motor is on pin configured for PWM
 
-
+// volatile so not optimized out for set but never used
+volatile int mSecToTurnMotor = 0;
+volatile int reasonStoppedMotor = 0;
 
 void     
 Motor::turnOn(uint16_t motorDutyCycle)
@@ -63,16 +65,21 @@ Vcc is not regulated.
 Vcc affects motor speed.
 
 A period of time determines how many turns.
-But we also stop prematurely when:
+We don't delay for the entire time, but iterate by mSec.
+We stop prematurely when:
    Vcc droops too low
    Motor feedback tells the count of turns
+Since we are polling every mSec, the motor may turn more than desired.
 */
 void
 Motor::driveAFewRevs(void)
 {
-    MotorControl::startTurnCounter(1, MOTOR_POLE_PAIRS);
-    // requires GIE enabled
-    SoC::enableGlobalInterrupts();
+    // For counting turns
+    // MotorControl::startTurnCounter(1, MOTOR_POLE_PAIRS);
+    MotorControl::enableSingleTurnInterrupt();
+
+    // requires GIE enabled.  It should be.
+    
 
 #ifdef AppMotorIsDC1_3
     // For DC motor, scale duty cycle
@@ -93,30 +100,48 @@ Motor::driveAFewRevs(void)
     
     //Pulse length experimentally determined for the specific motor
 
-    // A simple delay risks exhausting energy and booting MCU.
-    // Delay:: inMilliseconds(AppMotorPulsemSec);
+    reasonStoppedMotor = 1; // Default, may overwrite
 
-    /* Loop, monitoring Vcc after every mSec. */
+    /* Loop, polling Vcc and desired turns every mSec. */
     for (int i = AppMotorPulsemSec; i > 0; i--)
     {
         if (Energy::isEnoughToKeepWork()){
-            // Have we turned enough revs?
-            if (MotorControl::wasCountReachedFlag())
+            // Still enough energy
+            if (MotorControl::wasCountReachedFlag()) {
                 // Turned desired turns.
                 // Quit loop and stop driving motor.
+                Motor::turnOff();
+                reasonStoppedMotor = 3;
+
+                // remember how many mSecs actually spent turning.
+                // This sums time for motor to start plus time to turn desired count
+                mSecToTurnMotor = AppMotorPulsemSec - i;
                 break;
-            else
-                Delay:: inMilliseconds(1);
+            }
+            else {
+                 Delay:: oneMillisecond();
+            }
         }
         else {
             // Energy near exhausted.  
             // Quit loop and stop driving motor.
-            
+            reasonStoppedMotor = 2;
             break;
         }
     }
 
-    MotorControl::stopTurnCounter();
-    // TODO disableGIE ?
+
+    // MotorControl::stopTurnCounter();
+    MotorControl::disableSingleTurnInterrupt();
     Motor::turnOff();
+
+    /*
+    Either reasonStoppedMotor is:
+        3 turned desired, 
+        2 exhausted energy but might have turned some
+        1 time expired and might not have turned at all
+
+    Assume if time expired, motor never turned at all.
+    Return false so app knows? TODO
+    */
 }
