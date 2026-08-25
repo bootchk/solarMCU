@@ -7,17 +7,17 @@
 
 #include "app.h"   // configuration of work
 
-void 
+bool 
 Work::doWork(void) {
   // Change app.h def of AppWorkIsMotor to choose type of work.
 
 #if AppWorkIsMotor
-// Work is drive small motor a few revs
-  // Accounts for varying Vcc
-  Motor::driveAFewRevs();
+  // Work is drive small motor a few revs
+  return Motor::driveAFewRevs();
 #else
   // Work is blink an LED, the red LED on LaunchPad
   BlinkingLED::blinkFirst();
+  return true;
 #endif
 };
 

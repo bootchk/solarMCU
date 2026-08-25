@@ -40,9 +40,6 @@ We could change the duty cycle as Vcc drops but we don't.
 
 // Require motor is on pin configured for PWM
 
-// volatile so not optimized out for set but never used
-volatile int mSecToTurnMotor = 0;
-volatile int reasonStoppedMotor = 0;
 
 void     
 Motor::turnOn(uint16_t motorDutyCycle)
@@ -70,10 +67,16 @@ We stop prematurely when:
    Vcc droops too low
    Motor feedback tells the count of turns
 Since we are polling every mSec, the motor may turn more than desired.
+
+Return whether we think the motor turned.
 */
-void
+bool
 Motor::driveAFewRevs(void)
 {
+
+    // Default reason is time elapsed
+    int reasonStoppedMotor = 1;
+    
     // For counting turns
     // MotorControl::startTurnCounter(1, MOTOR_POLE_PAIRS);
     MotorControl::enableSingleTurnInterrupt();
@@ -100,8 +103,6 @@ Motor::driveAFewRevs(void)
     
     //Pulse length experimentally determined for the specific motor
 
-    reasonStoppedMotor = 1; // Default, may overwrite
-
     /* Loop, polling Vcc and desired turns every mSec. */
     for (int i = AppMotorPulsemSec; i > 0; i--)
     {
@@ -113,9 +114,9 @@ Motor::driveAFewRevs(void)
                 Motor::turnOff();
                 reasonStoppedMotor = 3;
 
-                // remember how many mSecs actually spent turning.
-                // This sums time for motor to start plus time to turn desired count
-                mSecToTurnMotor = AppMotorPulsemSec - i;
+                // Use an oscilloscope on PWM and FG to know timing.
+                // Time for motor to start plus time to turn desired count.
+                // The motor turns many turns before FG starts pulsing.
                 break;
             }
             else {
@@ -139,9 +140,9 @@ Motor::driveAFewRevs(void)
     Either reasonStoppedMotor is:
         3 turned desired, 
         2 exhausted energy but might have turned some
-        1 time expired and might not have turned at all
-
-    Assume if time expired, motor never turned at all.
-    Return false so app knows? TODO
+        1 time expired and but might have turned some
+    Result is true if feedback from motor said it turned.
+    Result false does not imply the motor did not turn.
     */
+    return (reasonStoppedMotor == 3);
 }

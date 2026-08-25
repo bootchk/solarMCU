@@ -1,5 +1,5 @@
 class Work {
 public:
-    static void doWork(void);
+    static bool doWork(void);
     static void doNotWork(void);
 };

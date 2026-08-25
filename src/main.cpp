@@ -11,19 +11,23 @@ The abstraction used is: app work.
 #include <cstdint>
 #include <msp430.h>
 
+
 // msp430drivers
 #include "msp430Drivers/src/periodicInterrupt/periodicInterrupt.h"
 #include "msp430Drivers/src/motorControl/motorControl.h"
+#include "msp430Drivers/src/SoC/SoC.h"
+
 
 #include "app.h"
 #include "workRateFSM.h"
 #include "energy.h"
 
 
-
+// This configuration will not take effect until unlock LPM5
+// The configuration MUST be as left it when entered LPM5
 void initGpio(void)
 {
-    // All GPIO pins are outputs
+    // Initially GPIO pins are outputs, low
     P1DIR = 0xFF; P2DIR = 0xFF;
     // with no pullup.
     P1REN = 0xFF; P2REN = 0xFF;
@@ -36,6 +40,10 @@ void initGpio(void)
     P3OUT = 0x00;
 #endif
 
+    // Then reconfigure used pins to their desired config
+
+    // Assert PWM pin to motor is low, driver IC is in standby
+    
     // For some implementations, init input pin used to monitor energy availability.
     Energy::initPin();
 
@@ -67,7 +75,7 @@ void appWork()
     P1OUT ^= BIT0;
 
     // Store P1OUT value in backup memory register
-    *(unsigned int *)BKMEM_BASE = P1OUT;
+    //*(unsigned int *)BKMEM_BASE = P1OUT;
 #elif defined(AppWorkIsMotor)
     WorkRateFSM::step();
 #else
@@ -86,8 +94,12 @@ appColdstart()
     // Assert the value is 0
     *(unsigned int *)BKMEM_BASE = P1OUT;
 #else
-    // On coldstart, no work.
-    // Instead, just enter LPM3.5 and wait for more energy.
+    /*
+    On coldstart, init work FSM.
+    Reset does not initialize FRAM and state variables.
+    */ 
+    WorkRateFSM::init();
+    // Now enter LPM3.5 and wait for more energy.
 #endif
 }
 
@@ -101,6 +113,8 @@ int main(void)
 
     initGpio();                             // Configure GPIO
 
+     // Using FRAM for persistent state variables through LPM3.5
+    SoC::disableFRAMWriteProtect();
 
     // First determine whether we are coming out of an LPMx.5 or a regular RESET.
     if (SYSRSTIV == SYSRSTIV_LPM5WU)        // When woken up from LPM3.5, reinit
@@ -112,10 +126,6 @@ int main(void)
         // Disable the GPIO power-on default high-impedance mode
         // to activate previously configured port settings
         PM5CTL0 &= ~LOCKLPM5;
-
-
-        // Restore P1OUT value from backup RAM memory, keep P1OUT after LPMx.5 reset
-        P1OUT = *(unsigned int *)BKMEM_BASE;
 
         __enable_interrupt();               
         // The RTC interrupt should trigger now.
