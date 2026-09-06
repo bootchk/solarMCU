@@ -1,13 +1,9 @@
 
 #include "motor.h"
 
-#include "msp430Drivers/src/PWM/PWM.h"
 #include "msp430Drivers/src/delay/delay.h"
+#include "msp430Drivers/src/motorControl/motorControl.h"
 #include "msp430Drivers/src/motorControl/motorSpeedFeedback.h"
-#include "msp430Drivers/src/i2c/i2c.h"
-
-//#include "msp430Drivers/src/ADC/adc.h"
-//#include "msp430Drivers/src/SoC/SoC.h"
 
 
 #include "energy.h"
@@ -15,6 +11,8 @@
 #include "app.h"
 
 /*
+TODO these comments are specific, make them more general.
+
 Drive a small 4mm diameter motor.
 Having a rated voltage of 1.3 - 1.6V
 
@@ -46,18 +44,13 @@ We could change the duty cycle as Vcc drops but we don't.
 void     
 Motor::turnOn(uint16_t motorDutyCycle)
 {
-    unsigned char buffer[3];
-
-    I2C::configureMaster( 1, true);
-    I2C::write(1, buffer, 3);
-    
-    ////PWM::turnOn(motorDutyCycle);
+    MotorControl::start(motorDutyCycle);
 }
 
 void 
 Motor::turnOff(void)
 {
-    ////PWM::turnOff();
+    MotorControl::stop();
     // Assert the timer is not counting.
     // Assert the pin is in low state.
 }
