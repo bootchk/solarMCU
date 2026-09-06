@@ -14,7 +14,7 @@ The abstraction used is: app work.
 
 // msp430drivers
 #include "msp430Drivers/src/periodicInterrupt/periodicInterrupt.h"
-#include "msp430Drivers/src/motorControl/motorControl.h"
+#include "msp430Drivers/src/motorControl/motorSpeedFeedback.h"
 #include "msp430Drivers/src/SoC/SoC.h"
 
 
@@ -47,8 +47,8 @@ void initGpio(void)
     // For some implementations, init input pin used to monitor energy availability.
     Energy::initPin();
 
-    MotorControl::initPinsForSingleTurn();
-    // MotorControl::initPinsForTurnCount();
+    MotorSpeedFeedback::initPinsForSingleTurn();
+    // MotorSpeedFeedback::initPinsForTurnCount();
 }
 
 

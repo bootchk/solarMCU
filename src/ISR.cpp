@@ -1,7 +1,7 @@
 
 #include <msp430.h>
 
-#include "msp430Drivers/src/motorControl/motorControl.h"
+#include "msp430Drivers/src/motorControl/motorSpeedFeedback.h"
 
 /*
 ISR for the WDT interrupt
@@ -49,7 +49,6 @@ __interrupt void RTC_ISR(void)
         default:         
           break;
     }
-
   // No need to clear LPM3?
   //__bic_SR_register_on_exit(LPM3_bits);
 }
@@ -59,7 +58,7 @@ __interrupt void RTC_ISR(void)
 #pragma vector = PORT2_VECTOR
 __interrupt void Port2_ISR(void)
 {
-  MotorControl::handlePinInterrupt();
+  MotorSpeedFeedback::handlePinInterrupt();
   // Not in LPM
 }
 
@@ -72,7 +71,7 @@ __interrupt void Port2_ISR(void)
 #pragma vector = TIMER0_B0_VECTOR
 __interrupt void TimerB0_CCR0_ISR(void)
 {
-  MotorControl::handleTimerInterrupt();
+  MotorSpeedFeedback::handleTimerInterrupt();
   // Not in LPM
 }
 
@@ -92,7 +91,7 @@ __interrupt void TimerB0_Other_ISR(void)
         // All are unexpected: not using CCR1, CCR2, or overflow
         default:
           // In all cases, pretend correct
-          MotorControl::handleInterrupt();
+          MotorSpeedFeedback::handleInterrupt();
           break;
     }
   // Not in LPM

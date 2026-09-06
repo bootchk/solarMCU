@@ -3,9 +3,11 @@
 
 #include "msp430Drivers/src/PWM/PWM.h"
 #include "msp430Drivers/src/delay/delay.h"
-#include "msp430Drivers/src/ADC/adc.h"
-#include "msp430Drivers/src/motorControl/motorControl.h"
-#include "msp430Drivers/src/SoC/SoC.h"
+#include "msp430Drivers/src/motorControl/motorSpeedFeedback.h"
+#include "msp430Drivers/src/i2c/i2c.h"
+
+//#include "msp430Drivers/src/ADC/adc.h"
+//#include "msp430Drivers/src/SoC/SoC.h"
 
 
 #include "energy.h"
@@ -44,13 +46,18 @@ We could change the duty cycle as Vcc drops but we don't.
 void     
 Motor::turnOn(uint16_t motorDutyCycle)
 {
-    PWM::turnOn(motorDutyCycle);
+    unsigned char buffer[3];
+
+    I2C::configureMaster( 1, true);
+    I2C::write(1, buffer, 3);
+    
+    ////PWM::turnOn(motorDutyCycle);
 }
 
 void 
 Motor::turnOff(void)
 {
-    PWM::turnOff();
+    ////PWM::turnOff();
     // Assert the timer is not counting.
     // Assert the pin is in low state.
 }
@@ -78,8 +85,8 @@ Motor::driveAFewRevs(void)
     int reasonStoppedMotor = 1;
     
     // For counting turns
-    // MotorControl::startTurnCounter(1, MOTOR_POLE_PAIRS);
-    MotorControl::enableSingleTurnInterrupt();
+    // MotorSpeedFeedback::startTurnCounter(1, MOTOR_POLE_PAIRS);
+    MotorSpeedFeedback::enableSingleTurnInterrupt();
 
     // requires GIE enabled.  It should be.
     
@@ -108,7 +115,7 @@ Motor::driveAFewRevs(void)
     {
         if (Energy::isEnoughToKeepWork()){
             // Still enough energy
-            if (MotorControl::wasCountReachedFlag()) {
+            if (MotorSpeedFeedback::wasCountReachedFlag()) {
                 // Turned desired turns.
                 // Quit loop and stop driving motor.
                 Motor::turnOff();
@@ -132,8 +139,8 @@ Motor::driveAFewRevs(void)
     }
 
 
-    // MotorControl::stopTurnCounter();
-    MotorControl::disableSingleTurnInterrupt();
+    // MotorSpeedFeedback::stopTurnCounter();
+    MotorSpeedFeedback::disableSingleTurnInterrupt();
     Motor::turnOff();
 
     /*
