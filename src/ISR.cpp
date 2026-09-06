@@ -64,6 +64,8 @@ __interrupt void Port2_ISR(void)
 }
 
 
+#if MOTOR_CONTROL_IS_COUNTING
+
 // Special vector for CCR0 of TimerB0.
 // No need to read TBIV, and clears CCR0IFG automatically
 // AKA TIMERB0_VECTOR
@@ -73,6 +75,8 @@ __interrupt void TimerB0_CCR0_ISR(void)
   MotorControl::handleTimerInterrupt();
   // Not in LPM
 }
+
+#endif
 
 
 #ifdef CRUFT

@@ -33,8 +33,8 @@ A set of parameters declares the total config of the app.
 Choice of motor defines another set of parameters.
 */
 //#define AppIsProductionDC1_3 1
-#define AppIsTestBLDCMaxon 1
-//#define AppIsProductionBLDCMaxon 1
+//#define AppIsTestBLDCMaxon 1
+#define AppIsProductionBLDCMaxon 1
 
 
 #if defined(AppIsProductionDC1_3)
