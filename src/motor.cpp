@@ -73,7 +73,6 @@ Return whether we think the motor turned.
 bool
 Motor::driveAFewRevs(void)
 {
-
     // Default reason is time elapsed
     int reasonStoppedMotor = 1;
     
@@ -138,9 +137,12 @@ Motor::driveAFewRevs(void)
 
     /*
     Either reasonStoppedMotor is:
-        3 turned desired, 
+        3 turned desired revs
         2 exhausted energy but might have turned some
-        1 time expired and but might have turned some
+        1 attempted turn entire period. Might have turned some.
+          This is the case for motors with no feedback.
+    */
+    /*
     Result is true if feedback from motor said it turned.
     Result false does not imply the motor did not turn.
     */

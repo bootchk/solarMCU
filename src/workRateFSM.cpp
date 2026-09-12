@@ -1,3 +1,5 @@
+#include "app.h"
+
 #include "workRateFSM.h"
 
 #include "work.h"
@@ -75,9 +77,15 @@ WorkRateFSM::step (void) {
     We wake every AppInterWakePeriod, say 1 minute.
     Wait long enough for physical system to unwind, say 5 minutes.
     */
-    /* To shortcut, temporarily change one transtion back to Start. */
+
+    /* To shortcut, define AppInterWorkIsShort */
     case FSMState::Turned:
+#if AppInterWorkIsShort
+      // Only two waits between work
+      workState = FSMState::Start;
+#else
       workState = FSMState::Wait1;
+#endif
       break;
     case FSMState::Wait1:
       workState = FSMState::Wait2;

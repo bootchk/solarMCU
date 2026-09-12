@@ -16,6 +16,7 @@ The parameters are:
     AppMotorIs: which motor
     EnergyFrom: what rail to monitor for energy availability, and how to monitor it.
     AppInterWorkPeriodInSeconds
+    AppInterWorkIsShort: true if two wait periods between work
 
 Other parameters are in motorParams.h
 */
@@ -33,8 +34,9 @@ A set of parameters declares the total config of the app.
 Choice of motor defines another set of parameters.
 */
 //#define AppIsProductionDC1_3 1
+#define AppIsBenchTestDC1_3  1
 //#define AppIsTestBLDCMaxon 1
-#define AppIsProductionBLDCMaxon 1
+//#define AppIsProductionBLDCMaxon 1
 
 
 #if defined(AppIsProductionDC1_3)
@@ -43,6 +45,7 @@ Choice of motor defines another set of parameters.
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
 #define AppInterWorkPeriodInSeconds 60
+#define AppInterWorkIsShort 1
 
 #elif defined(AppIsBenchTestDC1_3)
 // Test value using small DC motor
@@ -51,6 +54,8 @@ Choice of motor defines another set of parameters.
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
 #define AppInterWorkPeriodInSeconds 5
+#define AppInterWorkIsShort 1
+
 
 #elif defined(AppIsTestBLDCMaxon)
 
