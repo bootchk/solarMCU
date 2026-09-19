@@ -15,7 +15,7 @@ The parameters are:
     AppWorkIsMotor (otherwise LED)
     AppMotorIs: which motor
     EnergyFrom: what rail to monitor for energy availability, and how to monitor it.
-    AppInterWorkPeriodInSeconds
+    AppSleepPeriodInSeconds
     AppInterWorkIsShort: true if two wait periods between work
 
 Other parameters are in motorParams.h
@@ -33,8 +33,8 @@ or GPIO pin used to enable motor driver IC.
 A set of parameters declares the total config of the app.
 Choice of motor defines another set of parameters.
 */
-//#define AppIsProductionDC1_3 1
-#define AppIsBenchTestDC1_3  1
+#define AppIsProductionDC1_3 1
+//#define AppIsBenchTestDC1_3  1
 //#define AppIsTestBLDCMaxon 1
 //#define AppIsProductionBLDCMaxon 1
 
@@ -44,7 +44,7 @@ Choice of motor defines another set of parameters.
 #define AppWorkIsMotor 1
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
-#define AppInterWorkPeriodInSeconds 60
+#define AppSleepPeriodInSeconds 60
 #define AppInterWorkIsShort 1
 
 #elif defined(AppIsBenchTestDC1_3)
@@ -53,7 +53,7 @@ Choice of motor defines another set of parameters.
 #define AppWorkIsMotor 1
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
-#define AppInterWorkPeriodInSeconds 5
+#define AppSleepPeriodInSeconds 5
 #define AppInterWorkIsShort 1
 
 
@@ -62,21 +62,21 @@ Choice of motor defines another set of parameters.
 #define AppWorkIsMotor 1
 #define AppMotorIsMaxonEC9_2
 #define EnergyFromVcc  1
-#define AppInterWorkPeriodInSeconds 15
+#define AppSleepPeriodInSeconds 15
 
 #elif defined(AppIsProductionBLDCMaxon)
 
 #define AppWorkIsMotor 1
 #define AppMotorIsMaxonEC9_2
 #define EnergyFromVcc  1
-#define AppInterWorkPeriodInSeconds 60
+#define AppSleepPeriodInSeconds 60
 
 #elif defined(AppIsTestBLDCNFP1215)
 
 #define AppWorkIsMotor 1
 #define AppMotorIsNFP1215
 #define EnergyFromVHighRail 1
-#define AppInterWorkPeriodInSeconds 60
+#define AppSleepPeriodInSeconds 60
 
 // Other BLDC motors for other use cases
 //#define AppMotorIsNidec6s

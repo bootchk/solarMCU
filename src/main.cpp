@@ -64,7 +64,7 @@ Interrupts are periodic and continue.
 
 void initRTC(void)
 {
-    PeriodicInterrupt::initInSeconds(AppInterWorkPeriodInSeconds);
+    PeriodicInterrupt::initInSeconds(AppSleepPeriodInSeconds);
 }
 
 
