@@ -8,7 +8,7 @@
 
 #include "energy.h"
 #include "dutyCycleMotor.h"
-#include "app.h"
+#include "appConfig.h"
 
 /*
 TODO these comments are specific, make them more general.

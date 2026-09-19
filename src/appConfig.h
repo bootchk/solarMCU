@@ -82,7 +82,7 @@ Choice of motor defines another set of parameters.
 //#define AppMotorIsNidec6s
 
 #else
-#error "app.h does not define AppIs..."
+#error "appConfig.h does not define AppIs..."
 #endif
 
 

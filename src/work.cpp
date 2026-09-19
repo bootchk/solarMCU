@@ -5,11 +5,11 @@
 
 #include "motor.h"
 
-#include "app.h"   // configuration of work
+#include "appConfig.h"   // configuration of work
 
 bool 
 Work::doWork(void) {
-  // Change app.h def of AppWorkIsMotor to choose type of work.
+  // Change appConfig.h def of AppWorkIsMotor to choose type of work.
 
 #if AppWorkIsMotor
   // Work is drive small motor a few revs

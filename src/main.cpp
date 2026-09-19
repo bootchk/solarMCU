@@ -18,7 +18,7 @@ The abstraction used is: app work.
 #include "msp430Drivers/src/SoC/SoC.h"
 
 
-#include "app.h"
+#include "appConfig.h"
 #include "workRateFSM.h"
 #include "energy.h"
 

@@ -4,7 +4,7 @@
 
 #include "dutyCycleMotor.h"
 
-#include "app.h"
+#include "appConfig.h"
 
 
 /*
@@ -104,7 +104,7 @@ DutyCycleMotor::scaledToVcc()
         // Not turn motor when Vcc is too low.
         result = 0;
 
-    // Repect the constant defined in app.h
+    // Repect the constant defined in appConfig.h
     // No matter what the code above does.
     if (centiVolts < AppMinVccToWork)
         result = 0;
@@ -151,7 +151,7 @@ DutyCycleMotor::scaledToVcc()
         // Not turn motor when Vcc is too low.
         result = 0;
 
-    // Repect the constant defined in app.h
+    // Repect the constant defined in appConfig.h
     // No matter what the code above does.
     if (centiVolts < AppMinVccToWork)
         result = 0;

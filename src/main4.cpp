@@ -24,7 +24,7 @@ It hides implementation of LPM3.5 in class LPM5
 
 // The app
 #include "workRateFSM.h"
-#include "app.h"  // configuration of app
+#include "appConfig.h"  // configuration of app
 
 //#include "msp430Drivers/src/timer/timer.h"
 //#include "msp430Drivers/src/PMM/powerMgtModule.h"
