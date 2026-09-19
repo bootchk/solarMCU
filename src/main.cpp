@@ -19,7 +19,8 @@ The abstraction used is: app work.
 
 
 #include "appConfig.h"
-#include "workRateFSM.h"
+#include "app.h"
+
 #include "energy.h"
 
 
@@ -68,40 +69,7 @@ void initRTC(void)
 }
 
 
-void appWork()
-{
-#ifdef AppWorkIsLED
-    // Toggle LED on P1.0
-    P1OUT ^= BIT0;
 
-    // Store P1OUT value in backup memory register
-    //*(unsigned int *)BKMEM_BASE = P1OUT;
-#elif defined(AppWorkIsMotor)
-    WorkRateFSM::step();
-#else
-    #error "Define AppWorkIs..."
-#endif
-}
-
-void
-appColdstart()
-{
-#ifdef AppWorkIsLED
-    // Clear a backup memory location
-    *(unsigned int *)BKMEM_BASE = 0;
-
-    // Store P1OUT value in backup memory register before enter LPM3.5
-    // Assert the value is 0
-    *(unsigned int *)BKMEM_BASE = P1OUT;
-#else
-    /*
-    On coldstart, init work FSM.
-    Reset does not initialize FRAM and state variables.
-    */ 
-    WorkRateFSM::init();
-    // Now enter LPM3.5 and wait for more energy.
-#endif
-}
 
 
 
@@ -131,7 +99,7 @@ int main(void)
         // The RTC interrupt should trigger now.
         // The ISR does NOT toggle the LED
 
-        appWork();
+        App::work();
 
         // enter LPM3.5 again.
     }
@@ -148,7 +116,7 @@ int main(void)
         initRTC();
         // GIE is off: no interrupts yet
 
-        appColdstart();
+        App::coldStart();
     }
 
     // Enter LPM3.5 mode with interrupts enabled. Note that this operation does
