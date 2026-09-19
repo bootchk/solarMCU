@@ -31,9 +31,9 @@ enum class FSMState : unsigned char {
 #pragma PERSISTENT
 static FSMState workState = FSMState::Start;
 
-/* Reset the work FSM.
-The physical system driven by the motor
-could be in an unknown state.
+/* 
+Reset the work FSM.
+The physical system driven by the motor could be in an unknown state.
 We should reset to Turned and wait for physical system to stabilize.
 But that takes say 5 minutes.
 Assume that a reset comes from energy exhaustion below MCU Vmin (1.9V)
@@ -45,6 +45,28 @@ WorkRateFSM::init (void) {
   workState = FSMState::Start;
 }
 
+/*
+This hides the number of wait states actually waited,
+between one and six.
+*/
+FSMState
+nextStateAfterStart(void)
+{
+#if defined(AppInterWorkIsTwo)
+  // To last wait state so only two waits between work
+  return FSMState::Wait4;
+#elif defined(AppInterWorkIsOne)
+  // Sleep one period and then work again
+  return FSMState::Start;
+#elif defined(AppInterWorkIsSix)
+  // To first wait state so
+  // Six sleep periods between work
+  return FSMState::Turned;
+#else
+#error "AppInterWork not defined"
+#endif
+}
+
 void 
 WorkRateFSM::step (void) {
   
@@ -53,14 +75,14 @@ WorkRateFSM::step (void) {
     case FSMState::Start:
       if (Energy::isEnoughToWork()) {
         if (Work::doWork()) {
-          // Positive feedback that motor turned
-          workState = FSMState::Turned;
+          // Got positive feedback that motor turned
+          workState = nextStateAfterStart();
         }
         else {
-          // Not certain the motor actually turned,
+          // Got no feedback the motor actually turned,
           // but it might have.  Assume it did.
           // We always wait, i.e. allow time to unwind.
-          workState = FSMState::Turned;
+          workState = nextStateAfterStart();
         }
       }
       else {
@@ -80,12 +102,7 @@ WorkRateFSM::step (void) {
 
     /* To shortcut, define AppInterWorkIsShort */
     case FSMState::Turned:
-#if AppInterWorkIsShort
-      // Only two waits between work
-      workState = FSMState::Start;
-#else
       workState = FSMState::Wait1;
-#endif
       break;
     case FSMState::Wait1:
       workState = FSMState::Wait2;

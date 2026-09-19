@@ -2,7 +2,7 @@
 /*
 Parameters of the app.
 This describes variants of the app.
-The app is always: every period, work i.e. drive motor a few revs
+The app is always: every period, work (e.g. drive motor a few revs)
 if energy permits.
 
 Referenced by many source files.
@@ -33,19 +33,56 @@ or GPIO pin used to enable motor driver IC.
 A set of parameters declares the total config of the app.
 Choice of motor defines another set of parameters.
 */
-#define AppIsProductionDC1_3 1
+// App is turn the motor often, the system quickly stabilizes
+#define AppIsStriker 1
+
+// App is turn the motor less often, allow more time for system stabilize
+// The physical system is small, and resumes stable position quickly.
+//#define AppIsMobileSmall 1
+
+// App is turn motor less often.
+// The physical system is large and takes a long time to resume stable position.
+//#define AppIsMobileLarge
+
 //#define AppIsBenchTestDC1_3  1
 //#define AppIsTestBLDCMaxon 1
-//#define AppIsProductionBLDCMaxon 1
 
 
-#if defined(AppIsProductionDC1_3)
-// Production value using small DC motor
+
+
+
+
+
+#if defined(AppIsStriker)
+
 #define AppWorkIsMotor 1
+// small DC motor
+#define AppMotorIsDC1_3
+#define EnergyFromVcc  1
+#define AppSleepPeriodInSeconds 30
+// Wait half minute between motor turn
+#define AppInterWorkIsOne 1
+
+
+#elif defined(AppIsMobileSmall)
+
+#define AppWorkIsMotor 1
+// small DC motor
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
 #define AppSleepPeriodInSeconds 60
-#define AppInterWorkIsShort 1
+// Wait two minutes between motor turn
+#define AppInterWorkIsTwo
+
+
+#elif defined(AppIsMobileLarge)
+
+#define AppWorkIsMotor 1
+#define AppMotorIsMaxonEC9_2
+#define EnergyFromVcc  1
+#define AppSleepPeriodInSeconds 60
+#define AppInterWorkIsSix 1
+
 
 #elif defined(AppIsBenchTestDC1_3)
 // Test value using small DC motor
@@ -54,7 +91,7 @@ Choice of motor defines another set of parameters.
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
 #define AppSleepPeriodInSeconds 5
-#define AppInterWorkIsShort 1
+#define AppInterWorkIsOne 1
 
 
 #elif defined(AppIsTestBLDCMaxon)
@@ -63,13 +100,7 @@ Choice of motor defines another set of parameters.
 #define AppMotorIsMaxonEC9_2
 #define EnergyFromVcc  1
 #define AppSleepPeriodInSeconds 15
-
-#elif defined(AppIsProductionBLDCMaxon)
-
-#define AppWorkIsMotor 1
-#define AppMotorIsMaxonEC9_2
-#define EnergyFromVcc  1
-#define AppSleepPeriodInSeconds 60
+#define AppInterWorkIsOne 1
 
 #elif defined(AppIsTestBLDCNFP1215)
 
@@ -77,6 +108,7 @@ Choice of motor defines another set of parameters.
 #define AppMotorIsNFP1215
 #define EnergyFromVHighRail 1
 #define AppSleepPeriodInSeconds 60
+#define AppInterWorkIsOne 1
 
 // Other BLDC motors for other use cases
 //#define AppMotorIsNidec6s
