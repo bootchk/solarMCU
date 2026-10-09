@@ -58,9 +58,14 @@ nextStateAfterStart(void)
 #elif defined(AppInterWorkIsOne)
   // Sleep one period and then work again
   return FSMState::Start;
+#elif defined(AppInterWorkIsTwo)
+  // Return the last wait state so sleep two period and then work again.
+  return FSMState::Wait4;
+#elif defined(AppInterWorkIsThree)
+  // Sleep three period and then work again
+  return FSMState::Wait3;
 #elif defined(AppInterWorkIsSix)
-  // To first wait state so
-  // Six sleep periods between work
+  // To first wait state so six sleep periods between work
   return FSMState::Turned;
 #else
 #error "AppInterWork not defined"

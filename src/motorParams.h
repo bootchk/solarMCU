@@ -94,13 +94,25 @@ Experimentally:
 #elif defined(AppMotorIsNFP1215)
 
 // For NFP1215 BLDC motor
-#define AppMotorPulsemSec 100
+
+// 100 mSec is enough to turn motor AND for FG to assert low
+// i.e. for motor driver to say motor turned.
+// Measured is typically 80 mSec.
+#define AppMotorPulsemSec 120
+// Speed.  Don't need full speed.
 #define AppMotorDutyCycle 20
 
-// Nominal starting voltage 3.5
-#define AppMinVccToWork 340
+#if defined(TestOnLaunchpad)
 // NFP215 on Launchpad, whose Vcc is 3.3V nominal, 3.2 actual
-#define AppMinVccToWork 320
+#define AppMinVccToWork     320
+#else
+// Motor nominal starting voltage 3.5
+// Board Vcc 3.6 max, when enough light
+#define AppMinVccToWork     340
+#endif
+
+#define AppMinVccToKeepWork 190
+
 
 
 #elif defined(AppMotorIsNidec6s)

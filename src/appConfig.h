@@ -34,7 +34,7 @@ A set of parameters declares the total config of the app.
 Choice of motor defines another set of parameters.
 */
 // App is turn the motor often, the system quickly stabilizes
-#define AppIsStriker 1
+//#define AppIsStriker 1
 
 // App is turn the motor less often, allow more time for system stabilize
 // The physical system is small, and resumes stable position quickly.
@@ -46,6 +46,8 @@ Choice of motor defines another set of parameters.
 
 //#define AppIsBenchTestDC1_3  1
 //#define AppIsTestBLDCMaxon 1
+//#define AppIsTestBLDCNFP1215 1
+#define AppIsVeerBLDCNFP1215 1
 
 
 
@@ -59,8 +61,8 @@ Choice of motor defines another set of parameters.
 // small DC motor
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
-#define AppSleepPeriodInSeconds 30
-// Wait half minute between motor turn
+#define AppSleepPeriodInSeconds 60
+// Wait one minute between motor turn
 #define AppInterWorkIsOne 1
 
 
@@ -102,13 +104,26 @@ Choice of motor defines another set of parameters.
 #define AppSleepPeriodInSeconds 15
 #define AppInterWorkIsOne 1
 
+
 #elif defined(AppIsTestBLDCNFP1215)
 
 #define AppWorkIsMotor 1
 #define AppMotorIsNFP1215
-#define EnergyFromVHighRail 1
-#define AppSleepPeriodInSeconds 60
+// Vmotor is same as Vmcu
+#define EnergyFromVcc 1
+#define AppSleepPeriodInSeconds 15
 #define AppInterWorkIsOne 1
+#define TestOnLaunchpad   1
+
+#elif defined(AppIsVeerBLDCNFP1215)
+
+#define AppWorkIsMotor 1
+#define AppMotorIsNFP1215
+// Vmotor is same as Vmcu
+#define EnergyFromVcc 1
+#define AppSleepPeriodInSeconds 60
+// Three minutes between motor turns.
+#define AppInterWorkIsThree 1
 
 // Other BLDC motors for other use cases
 //#define AppMotorIsNidec6s
