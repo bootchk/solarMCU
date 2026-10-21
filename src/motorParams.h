@@ -61,6 +61,8 @@ Experimentally:
 #define AppMinVccToWork 240
 #define AppMinVccToKeepWork 190
 
+// Moot for this motor: no motor speed feeback
+#define AppDesiredMotorTurns 0
 
 
 
@@ -89,18 +91,23 @@ Experimentally:
 #define AppMinVccToWork 310
 #define AppMinVccToKeepWork 190
 
+// One indicated turn is many actual revs
+#define AppDesiredMotorTurns 1
 
 
 #elif defined(AppMotorIsNFP1215)
 
 // For NFP1215 BLDC motor
 
-// 100 mSec is enough to turn motor AND for FG to assert low
+// 100-120 mSec is enough to turn motor AND for FG to assert low
 // i.e. for motor driver to say motor turned.
-// Measured is typically 80 mSec.
-#define AppMotorPulsemSec 120
-// Speed.  Don't need full speed.
-#define AppMotorDutyCycle 20
+// Measured is typically 50-80 mSec, depends on duty cycle.
+// But allow more than engough, 200 mSec and count turns
+#define AppMotorPulsemSec 200
+
+// Speed.
+// Motor seems to start much better at full speed.
+#define AppMotorDutyCycle 100
 
 #if defined(TestOnLaunchpad)
 // NFP215 on Launchpad, whose Vcc is 3.3V nominal, 3.2 actual
@@ -108,11 +115,17 @@ Experimentally:
 #else
 // Motor nominal starting voltage 3.5
 // Board Vcc 3.6 max, when enough light
-#define AppMinVccToWork     340
+#define AppMinVccToWork     350
 #endif
 
 #define AppMinVccToKeepWork 190
 
+// Motor may actually turn before driver indicates
+// that BEMF is reliably detected.
+// NPP1215 is one pole pair (one permanent magnet.)
+// FG indicates frequency/pole pairs.
+// So for NFP1215, signal FG from driver i sis mechanical rev/sec.
+#define AppDesiredMotorTurns 3
 
 
 #elif defined(AppMotorIsNidec6s)

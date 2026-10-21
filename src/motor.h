@@ -9,4 +9,6 @@ public:
     static void turnOff(void);
     
     static bool driveAFewRevs(void);
+
+    static bool didTurnDesiredTurns(unsigned int desiredTurns);
 };

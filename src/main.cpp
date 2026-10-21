@@ -48,8 +48,9 @@ void initGpio(void)
     // For some implementations, init input pin used to monitor energy availability.
     Energy::initPin();
 
-    MotorSpeedFeedback::initPinsForSingleTurn();
-    // MotorSpeedFeedback::initPinsForTurnCount();
+    // For some implementations, init input pin to count motor turns.
+    // The pin should have external pullup/down to ensure not draw current in LPM3.5
+    MotorSpeedFeedback::initPinsForTurnInterrupt();
 }
 
 

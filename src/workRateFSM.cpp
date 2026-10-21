@@ -52,10 +52,7 @@ between one and six.
 FSMState
 nextStateAfterStart(void)
 {
-#if defined(AppInterWorkIsTwo)
-  // To last wait state so only two waits between work
-  return FSMState::Wait4;
-#elif defined(AppInterWorkIsOne)
+#if defined(AppInterWorkIsOne)
   // Sleep one period and then work again
   return FSMState::Start;
 #elif defined(AppInterWorkIsTwo)

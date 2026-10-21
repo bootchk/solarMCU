@@ -38,16 +38,22 @@ Choice of motor defines another set of parameters.
 
 // App is turn the motor less often, allow more time for system stabilize
 // The physical system is small, and resumes stable position quickly.
+// board is BOARD_SMART_UNIV
 //#define AppIsMobileSmall 1
 
 // App is turn motor less often.
 // The physical system is large and takes a long time to resume stable position.
 //#define AppIsMobileLarge
 
+// App is medium size
+// The physical system is large and takes a long time to resume stable position.
+#define AppIsVeerBLDCNFP1215 1
+
 //#define AppIsBenchTestDC1_3  1
 //#define AppIsTestBLDCMaxon 1
 //#define AppIsTestBLDCNFP1215 1
-#define AppIsVeerBLDCNFP1215 1
+
+
 
 
 
@@ -93,7 +99,7 @@ Choice of motor defines another set of parameters.
 #define AppMotorIsDC1_3
 #define EnergyFromVcc  1
 #define AppSleepPeriodInSeconds 5
-#define AppInterWorkIsOne 1
+#define AppInterWorkIsTwo 1
 
 
 #elif defined(AppIsTestBLDCMaxon)
@@ -113,7 +119,9 @@ Choice of motor defines another set of parameters.
 #define EnergyFromVcc 1
 #define AppSleepPeriodInSeconds 15
 #define AppInterWorkIsOne 1
+// vccToWork 3.2
 #define TestOnLaunchpad   1
+
 
 #elif defined(AppIsVeerBLDCNFP1215)
 
@@ -124,6 +132,7 @@ Choice of motor defines another set of parameters.
 #define AppSleepPeriodInSeconds 60
 // Three minutes between motor turns.
 #define AppInterWorkIsThree 1
+
 
 // Other BLDC motors for other use cases
 //#define AppMotorIsNidec6s
